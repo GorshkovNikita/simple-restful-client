@@ -1,0 +1,9 @@
+<h3>Посты</h3>
+<ul>
+    <li ng-repeat="post in posts">
+        ID: {{ post.id }} <br>
+        Content: {{ post.content }} <br>
+        Date: {{ post.date | date:'yyyy-MM-dd HH:mm:ss' }} <br>
+        Author: {{ post.author.name }}
+    </li>
+</ul>
