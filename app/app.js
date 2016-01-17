@@ -18,6 +18,12 @@ app.config(['$routeProvider', function ($routeProvider) {
         controllerAs: 'login',
         templateUrl: 'templates/login.html'
     });
+
+    $routeProvider.when('/my-posts', {
+        controller: PostController,
+        controllerAs: 'posts',
+        templateUrl: 'templates/posts.html'
+    });
 }]);
 
 app.constant('constants', {
@@ -29,15 +35,26 @@ app.constant('constants', {
 app.factory('Users', ['$resource', '$cookies', 'constants', function ($resource, $cookies, constants) {
     return $resource(constants.baseURL + 'service/users/:id', {},
         {
-        getCurrentUser: {
-            url: constants.baseURL + 'service/current-user',
-            method: 'GET'
+            getCurrentUser:
+            {
+                url: constants.baseURL + 'service/current-user',
+                method: 'GET'
+            }
         }
-    });
+    );
 }]);
 
 app.factory('Posts', ['$resource', '$cookies', 'constants', function ($resource, $cookies, constants) {
-    return $resource(constants.baseURL + 'service/posts/:id');
+    return $resource(constants.baseURL + 'service/posts/:id', {},
+        {
+            getMyPosts:
+            {
+                url: constants.baseURL + 'service/my-posts',
+                method: 'GET',
+                isArray: true
+            }
+        }
+    );
 }]);
 
 app.factory('Login', ['$resource', 'constants', function($resource, constants) {
@@ -60,19 +77,21 @@ var UserController = function ($scope, $http, $location, $cookies, $rootScope, U
         $scope.user = Users.get({
                 id: id,
                 access_token: $cookies.get('access_token')
-            }).$promise.then(
-                function(user) {
-                    $scope.user = user;
-                },
-                function() {
-                    $location.url('login');
-                    $rootScope.user = {};
-                }
-            );
+            },
+            function(user) {
+                $scope.user = user;
+            },
+            function() {
+                $location.url('login');
+                $rootScope.user = {};
+            }
+        );
     };
 
     $scope.getAllUsers = function () {
-        Users.query({ access_token: $cookies.get('access_token') }).$promise.then(
+        Users.query({
+                access_token: $cookies.get('access_token')
+            },
             function(users) {
                 $scope.users = users;
             },
@@ -93,7 +112,10 @@ var UserController = function ($scope, $http, $location, $cookies, $rootScope, U
 
 var PostController = function ($scope, $http, $location, $cookies, $rootScope, Posts) {
     $scope.getPost = function (id) {
-        Posts.get({ id: id, access_token: $cookies.get('access_token') }).$promise.then(
+        Posts.get({
+                id: id,
+                access_token: $cookies.get('access_token')
+            },
             function(post) {
                 $scope.post = post;
             },
@@ -105,7 +127,9 @@ var PostController = function ($scope, $http, $location, $cookies, $rootScope, P
     };
 
     $scope.getAllPosts = function () {
-        Posts.query({access_token: $cookies.get('access_token') }).$promise.then(
+        Posts.query({
+                access_token: $cookies.get('access_token')
+            },
             function(posts) {
                 $scope.posts = posts;
             },
@@ -116,9 +140,26 @@ var PostController = function ($scope, $http, $location, $cookies, $rootScope, P
         );
     };
 
-    $scope.getAllPosts();
+    $scope.getMyPosts = function () {
+        Posts.getMyPosts({
+                access_token: $cookies.get('access_token')
+            },
+            function(posts) {
+                $scope.posts = posts;
+            },
+            function() {
+                $location.url('login');
+                $rootScope.user = {};
+            }
+        );
+    };
 
-    $scope.$on('$destroy', function iVeBeenDismissed() {
+    if ($location.url().indexOf("my") > -1)
+        $scope.getMyPosts();
+    else
+        $scope.getAllPosts();
+
+    $scope.$on('$destroy', function() {
         // при переходе на другой путь объект контроллера уничтожается
         // alert("controller post was destroyed");
     });
@@ -128,7 +169,6 @@ var LoginController = function ($scope, $http, $cookies, $location, $rootScope, 
     $scope.username = 'nikita';
     $scope.passsword ='';
     $scope.wrong = false;
-    $scope.msg = 'Неверный логин или пароль';
 
     $scope.getAccessToken = function() {
         Login.getToken({
@@ -136,14 +176,12 @@ var LoginController = function ($scope, $http, $cookies, $location, $rootScope, 
                 password: $scope.password
             },
             function (response) {
-                //alert(response.access_token);
                 $cookies.put('access_token', response.access_token);
                 $rootScope.user = Users.getCurrentUser({access_token: response.access_token});
                 $scope.wrong = false;
             },
             function (response) {
                 $scope.wrong = true;
-                //alert('Ошибка' + response.status + ' ' + $scope.msg);
             }
         );
     };
