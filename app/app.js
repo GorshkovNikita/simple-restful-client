@@ -1,29 +1,22 @@
-var app = angular.module('myApp', ['ngRoute', 'ngCookies', 'ngResource']);
+var app = angular.module('myApp', ['ui.router', 'ngCookies', 'ngResource']);
 
-app.config(['$routeProvider', function ($routeProvider) {
-    $routeProvider.when('/', {
-        controller: UserController,
-        controllerAs: 'users',
-        templateUrl: 'templates/users.html'
-    });
-
-    $routeProvider.when('/posts', {
-        controller: PostController,
-        controllerAs: 'posts',
-        templateUrl: 'templates/posts.html'
-    });
-
-    $routeProvider.when('/login', {
-        controller: LoginController,
-        controllerAs: 'login',
-        templateUrl: 'templates/login.html'
-    });
-
-    $routeProvider.when('/my-posts', {
-        controller: PostController,
-        controllerAs: 'posts',
-        templateUrl: 'templates/posts.html'
-    });
+app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+    $stateProvider
+        .state('users', {
+            url: '/',
+            templateUrl: 'templates/users.html',
+            controller: UserController
+        })
+        .state('posts', {
+            url: '/posts',
+            templateUrl: 'templates/posts.html',
+            controller: PostController
+        })
+        .state('login', {
+            url: '/login',
+            templateUrl: 'templates/login.html',
+            controller: LoginController
+        });
 }]);
 
 app.constant('constants', {
@@ -178,6 +171,7 @@ var LoginController = function ($scope, $http, $cookies, $location, $rootScope, 
             function (response) {
                 $cookies.put('access_token', response.access_token);
                 $rootScope.user = Users.getCurrentUser({access_token: response.access_token});
+                $location.url('/');
                 $scope.wrong = false;
             },
             function (response) {
@@ -186,3 +180,31 @@ var LoginController = function ($scope, $http, $cookies, $location, $rootScope, 
         );
     };
 };
+
+
+// Конфиг роутинга для библиотеки ngRoute
+//app.config(['$routeProvider', function ($routeProvider) {
+//    $routeProvider.when('/', {
+//        controller: UserController,
+//        controllerAs: 'users',
+//        templateUrl: 'templates/users.html'
+//    });
+//
+//    $routeProvider.when('/posts', {
+//        controller: PostController,
+//        controllerAs: 'posts',
+//        templateUrl: 'templates/posts.html'
+//    });
+//
+//    $routeProvider.when('/login', {
+//        controller: LoginController,
+//        controllerAs: 'login',
+//        templateUrl: 'templates/login.html'
+//    });
+//
+//    $routeProvider.when('/my-posts', {
+//        controller: PostController,
+//        controllerAs: 'posts',
+//        templateUrl: 'templates/posts.html'
+//    });
+//}]);
