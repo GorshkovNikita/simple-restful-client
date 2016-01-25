@@ -1,23 +1,55 @@
 var app = angular.module('myApp', ['ui.router', 'ngCookies', 'ngResource']);
 
-app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
+app.config(function($stateProvider, $urlRouterProvider) {
     $stateProvider
-        .state('users', {
+        .state('root', {
+            views: {
+                'header': {
+                    templateUrl: 'templates/header.html'
+                },
+                'footer': {
+                    templateUrl: 'templates/footer.html'
+                }
+            }
+        })
+        .state('root.users', {
             url: '/',
-            templateUrl: 'templates/users.html',
-            controller: UserController
+            views: {
+                // viewname@statename
+                'content@': {
+                    templateUrl: 'templates/users.html',
+                    controller: UserController
+                }
+            }
         })
-        .state('posts', {
+        .state('root.posts', {
             url: '/posts',
-            templateUrl: 'templates/posts.html',
-            controller: PostController
+            views: {
+                'content@': {
+                    templateUrl: 'templates/posts.html',
+                    controller: PostController
+                }
+            }
         })
-        .state('login', {
+        .state('root.my-posts', {
+            url: '/my-posts',
+            views: {
+                'content@': {
+                    templateUrl: 'templates/posts.html',
+                    controller: PostController
+                }
+            }
+        })
+        .state('root.login', {
             url: '/login',
-            templateUrl: 'templates/login.html',
-            controller: LoginController
+            views: {
+                'content@': {
+                    templateUrl: 'templates/login.html',
+                    controller: LoginController
+                }
+            }
         });
-}]);
+});
 
 app.constant('constants', {
     baseURL: 'http://localhost:8080/',
@@ -30,7 +62,7 @@ app.factory('Users', ['$resource', '$cookies', 'constants', function ($resource,
         {
             getCurrentUser:
             {
-                url: constants.baseURL + 'service/current-user',
+                url: constants.baseURL + 'service/me',
                 method: 'GET'
             }
         }

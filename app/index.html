@@ -15,17 +15,9 @@
     </head>
     <body ng-app="myApp">
         <div class="container">
-
-            <ul class="menu">
-                <li><a ui-sref="users">Пользователи</a></li>
-                <li><a ui-sref="my-posts">Мои посты</a> </li>
-                <li><a ui-sref="posts">Все посты</a></li>
-                <li><a ui-sref="login">Войти</a></li>
-            </ul>
-            {{ user.name }}
-            <hr class="" />
-            <!--<div ng-view></div>-->
-            <div ui-view></div>
+            <div ui-view="header"></div>
+            <div ui-view="content"></div>
+            <div ui-view="footer"></div>
         </div>
     </body>
 </html>
