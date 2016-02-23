@@ -48,6 +48,15 @@ app.config(function($stateProvider, $urlRouterProvider) {
                     controller: LoginController
                 }
             }
+        })
+        .state('root.wall', {
+            url: '/wall',
+            views: {
+                'content@': {
+                    templateUrl: 'templates/wall.html',
+                    controller: WallController
+                }
+            }
         });
 });
 
@@ -80,6 +89,10 @@ app.factory('Posts', ['$resource', '$cookies', 'constants', function ($resource,
             }
         }
     );
+}]);
+
+app.factory('Wall', ['$resource', 'constants', function($resource, constants) {
+    return $resource(constants.baseURL + 'test');
 }]);
 
 app.factory('Login', ['$resource', 'constants', function($resource, constants) {
@@ -188,6 +201,17 @@ var PostController = function ($scope, $http, $location, $cookies, $rootScope, P
         // при переходе на другой путь объект контроллера уничтожается
         // alert("controller post was destroyed");
     });
+};
+
+var WallController = function ($scope, Wall) {
+    $scope.getNotes = function () {
+        Wall.query({},
+            function(notes) {
+                $scope.notes = notes;
+            });
+    };
+
+    $scope.getNotes();
 };
 
 var LoginController = function ($scope, $http, $cookies, $location, $rootScope, constants, Login, Users) {

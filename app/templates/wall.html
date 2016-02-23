@@ -1,0 +1,15 @@
+<h3>Стена</h3>
+<ul>
+    <li ng-repeat="note in notes" ng-switch="note.id">
+        <div ng-switch-when="1">
+            ID: {{ note.id }} <br>
+            Name: {{ note.username }} <br>
+            Password: {{ note.password }} <br>
+        </div>
+        <div ng-switch-when="5">
+            ID: {{ note.id }} <br>
+            Author: {{ note.author.username }} <br>
+            Content: {{ note.content }} <br>
+        </div>
+    </li>
+</ul>
